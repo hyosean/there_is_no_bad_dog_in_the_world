@@ -4,13 +4,14 @@ import {useEffect, useState} from 'react';
 const Search = () => {
 	const [list, setList] = useState([]);
 	const [dog, setDog] = useState([]);
-	const [imgUrl, setImgurl] = useState();
+	//const [imgUrl, setImgurl] = useState([]);
 	const getData = async () => {
 		const response = await axios.get('https://dog.ceo/api/breeds/list/all');
 		const list = Object.keys(response.data.message);
 		setList(list);
 	};
 	useEffect(() => getData(), []);
+	useEffect(() => onImgUrl(), [dog]);
 
 	const onSearch = (e) => {
 		let text = e.target.value;
@@ -18,10 +19,13 @@ const Search = () => {
 		const searchList = list.filter((cur) => !cur.indexOf(text));
 		console.log(searchList);
 		setDog(searchList);
+	};
 
-		const imgs = searchList.map((cur) => axios.get(`https://dog.ceo/api/breed/${cur}/images`));
-		console.log(imgs.message[0]);
-		setImgurl(imgs.message[0]);
+	const onImgUrl = (idx) => {
+		//const imgs = dog.map((cur) => axios.get(`https://dog.ceo/api/breed/${cur}/images`));
+		let imgList = [...imgs];
+		console.log(imgList[idx]);
+		return imgList[idx];
 	};
 
 	return (
@@ -32,7 +36,7 @@ const Search = () => {
 				{dog.map((cur, idx) => (
 					<li key={idx}>
 						{cur}
-						<img src={imgUrl} alt={cur} />
+						<img src={onImgUrl(idx)} alt={cur} />
 					</li>
 				))}
 			</ul>
