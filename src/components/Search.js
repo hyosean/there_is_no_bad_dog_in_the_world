@@ -4,39 +4,46 @@ import {useEffect, useState} from 'react';
 const Search = () => {
 	const [list, setList] = useState([]);
 	const [dog, setDog] = useState([]);
-	//const [imgUrl, setImgurl] = useState([]);
+	const [searchText, setSearchText] = useState('');
+	const [imgUrl, setImgurl] = useState([]);
 	const getData = async () => {
 		const response = await axios.get('https://dog.ceo/api/breeds/list/all');
 		const list = Object.keys(response.data.message);
 		setList(list);
 	};
+	const onImgUrl = async () => {
+		let imgs = [];
+		for (let i = 0; i < dog.length; i++) {
+			let imgsList = await axios.get(`https://dog.ceo/api/breed/${dog[i]}/images`);
+			console.log(imgsList.data.message[i]);
+			imgs.push(imgsList.data.message[i]);
+		}
+		setImgurl(imgs);
+	};
 	useEffect(() => getData(), []);
 	useEffect(() => onImgUrl(), [dog]);
 
 	const onSearch = (e) => {
-		let text = e.target.value;
-
-		const searchList = list.filter((cur) => !cur.indexOf(text));
-		console.log(searchList);
-		setDog(searchList);
+		setSearchText(e.target.value);
 	};
 
-	const onImgUrl = (idx) => {
-		//const imgs = dog.map((cur) => axios.get(`https://dog.ceo/api/breed/${cur}/images`));
-		let imgList = [...imgs];
-		console.log(imgList[idx]);
-		return imgList[idx];
+	const onClick = () => {
+		const searchList = list.filter((cur) => !cur.indexOf(searchText));
+		setDog(searchList);
 	};
 
 	return (
 		<>
-			<strong>SEARCH</strong>
-			<input type="text" className="search_bar" onInput={(e) => onSearch(e)} />
-			<ul>
+			<strong className="search_tag">DOG NAME :</strong>
+			<input type="text" placeholder="enter the dog's name" className="search_bar" onInput={(e) => onSearch(e)} />
+			<button className="search_btn" onClick={onClick}>
+				search
+			</button>
+			<ul className="search_list">
 				{dog.map((cur, idx) => (
 					<li key={idx}>
-						{cur}
-						<img src={onImgUrl(idx)} alt={cur} />
+						<span>{cur}</span>
+						<img src={imgUrl[idx]} alt={cur} />
 					</li>
 				))}
 			</ul>
